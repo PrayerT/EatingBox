@@ -23,6 +23,7 @@ public class RecordAdapter extends ListActivity {
     private MyCustomAdapter mAdapter;
     MainActivity mainActivity = new MainActivity();
     private String name = mainActivity.acc;
+    private String recentRecord;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -37,7 +38,7 @@ public class RecordAdapter extends ListActivity {
                     OutputStream sendData = socket.getOutputStream();
                     sendData.write((name + "\r\n").getBytes(StandardCharsets.UTF_8));
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8));
-                    String recentRecord = bufferedReader.readLine();
+                    recentRecord = bufferedReader.readLine();
 
                     sendData.close();
                     bufferedReader.close();
@@ -48,6 +49,10 @@ public class RecordAdapter extends ListActivity {
                 }
             }
         });
+
+        String[][] record = mAdapter.formateRecord(recentRecord);
+
+
         for (int i = 1; i < 50; i++) {
             mAdapter.addItem("item " + i);
         }
@@ -115,6 +120,17 @@ public class RecordAdapter extends ListActivity {
             }
             holder.textView.setText(mData.get(position).toString());
             return convertView;
+        }
+
+        private String[][] formateRecord(String rec){
+            if (rec == null) return null;
+            String[] temp1 = rec.split("&");
+            String[][] temp2 = new String[temp1.length][];
+            for (int i = 0;i < temp1.length;i++){
+                String[] temp = temp1[i].split("#");
+                temp2[i] = temp;
+            }
+            return temp2;
         }
 
     }
